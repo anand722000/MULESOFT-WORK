@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="Scatter_GatherFlow" doc:id="40977438-fdf7-4aa9-bb4d-80555f44f361" >
+		<http:listener doc:name="Listener" doc:id="e4f4e443-0905-430e-b5c2-83f6af308b8f" config-ref="HTTP_Listener_config" path="/sc">
+		</http:listener>
+		<logger level="INFO" doc:name="Logger" doc:id="662efc4f-5ed5-453d-854a-ab22845cca81" message='"Flow Started... "'/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="ecff5557-b752-40aa-a223-9f7ac0613a13" >
+			<route >
+				<set-payload value='#[{ "key1" : "anand1"  ,&#10;  "Name" : "Anand Singh"&#10;}]' doc:name="Set Payload" doc:id="792fbc25-654d-4c15-a77b-cb4a521cc55e" />
+			</route>
+			<route >
+				<set-payload value='#[{ "key2" : "anand2" ,&#10;	"Addres" : "India"&#10;}]' doc:name="Set Payload" doc:id="40d4aebc-d028-42c1-9eed-6f565c3dc12a" />
+			</route>
+			<route >
+				<set-payload value='#[{ "key3" : "anand3" ,&#10;	"Id" : "7"&#10;}]' doc:name="Set Payload" doc:id="ae49c45f-bec3-4be3-be70-6f276ee7aa68" />
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="Transform Message" doc:id="7ba92bed-8873-40d9-a82d-4dd4ccb27301" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="66853106-6a98-4aef-b2cd-96c9d974471b" message="#[payload..payload]" />
+	</flow>
+</mule>

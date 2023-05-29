@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="1becee06-6882-48bf-86e9-9b08d7848d1a" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="7888788135Aa@" database="ananddb" />
+	</db:config>
+	<flow name="SELECT" doc:id="0afa1aa9-ab2f-4095-abf9-71013e3d4ddb" >
+		<http:listener doc:name="Listener" doc:id="20713a2a-104e-4578-856f-e91d70fa2a2c" path="/mysqlselect" config-ref="HTTP_Listener_config"/>
+		<db:select doc:name="Select" doc:id="8a97f976-91b7-4acc-9ff4-5d93dd290039" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * FROM ananddb.studentinfo]]></db:sql>
+		</db:select>
+		<logger level="INFO" doc:name="Logger" doc:id="7f5b2bd3-f7bc-4ae2-a95d-d360bce55005" message="#[%dw 2.0&#10;output application/dw&#10;---&#10;payload]"/>
+	</flow>
+	<flow name="WHERE" doc:id="17506da8-9cc6-4d63-9f90-f3401397f87f" >
+		<http:listener doc:name="Listener" doc:id="5938bc5e-833b-4f43-a2d0-eac4e7255edd" path="/where" config-ref="HTTP_Listener_config"/>
+		<db:select doc:name="Where" doc:id="df1f038e-3bee-4714-8fd9-3c33e335ce61" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * FROM ananddb.studentinfo where studentId = 101]]></db:sql>
+		</db:select>
+		<logger level="INFO" doc:name="Logger" doc:id="e0c1e3da-cd51-4610-ac09-fabbcaab6745" message="#[%dw 2.0&#10;output application/dw&#10;---&#10;payload]"/>
+	</flow>
+	<flow name="INSERT" doc:id="215137bf-d5fe-42ad-a304-66d05a5e0fc9" >
+		<http:listener doc:name="Listener" doc:id="536030c9-bfcc-4bcc-a065-06f67fe86916" path="/insert" config-ref="HTTP_Listener_config"/>
+		<db:insert doc:name="Insert" doc:id="d75304c7-54d9-44c1-8cfe-22a13aad47e5" config-ref="Database_Config">
+			<db:sql ><![CDATA[INSERT INTO ananddb.emp_info
+VALUES (:id , :name , :mobile , :address  , :Email )]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'id':payload.id , 'name':payload.name , 'mobile':payload.mobile , 'address':payload.address , 'Email':payload.email}]]]></db:input-parameters>
+		</db:insert>
+		<logger level="INFO" doc:name="Logger" doc:id="fc2a933a-ed34-4352-815b-bb466fd6b85c" message="Value Inserted in Table . . ."/>
+	</flow>
+	<flow name="UPDATE" doc:id="262a5987-d5ca-43ee-9cb7-1aeea8bceccc" >
+		<http:listener doc:name="Listener" doc:id="418aaae2-33c1-4a9f-b445-50a8b363c108" config-ref="HTTP_Listener_config" path="/update"/>
+		<db:update doc:name="Update" doc:id="b5b8fed9-9070-4a31-9383-f4d07db420a8" config-ref="Database_Config">
+			<db:sql ><![CDATA[UPDATE emp_info
+SET id = :id , name = :name , mobile = :mobile , address = :address ,Email = :email
+WHERE id = 111]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'id' : payload.id , 'name': payload.name , 'mobile': payload.mobile , 'address':payload.address , 'email':payload.email}]]]></db:input-parameters>
+		</db:update>
+		<logger level="INFO" doc:name="Logger" doc:id="797615a3-4803-4d48-af3b-d4e101ee1263" message="Table Updated . . . "/>
+	</flow>
+	<flow name="DELETE" doc:id="4d7aa9b0-674c-46f7-a5fe-b3fe34bb2438" >
+		<http:listener doc:name="Listener" doc:id="6e32729d-0850-423a-9201-ec703cc3127b" config-ref="HTTP_Listener_config" path="/delete"/>
+		<db:delete doc:name="Delete" doc:id="26548bc1-96e5-4d02-8412-7169864b16f8" config-ref="Database_Config">
+			<db:sql ><![CDATA[DELETE
+FROM emo_info
+WHERE id = :id]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'id' : payload.id}]]]></db:input-parameters>
+		</db:delete>
+		<logger level="INFO" doc:name="Logger" doc:id="bd0ce119-6489-4579-94d5-3a87e4395f42" message="Table Deleted . . . "/>
+	</flow>
+</mule>

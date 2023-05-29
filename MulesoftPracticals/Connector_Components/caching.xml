@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<ee:object-store-caching-strategy name="Caching_Strategy" doc:name="Caching Strategy" doc:id="620c44f3-331f-444a-bbf5-ed41d4353ff6" keyGenerationExpression="#[attributes.uriParams.pincode]" />
+	<flow name="cachingFlow" doc:id="0dceac54-317d-4213-a24b-0df7d944278d" >
+		<http:listener doc:name="Listener" doc:id="44c12555-fd46-4383-b25d-66b9e698bf51" config-ref="HTTP_Listener_config" path="/cache/{pincode}" allowedMethods="GET"/>
+		<logger level="INFO" doc:name="Started Before Cache outside" doc:id="49bc55fe-d511-429e-8f45-028272736b55" message="Started Before Cache outside"/>
+		<ee:cache doc:name="Cache" doc:id="767b0123-ce7b-4233-98b2-16fe9bef7bd5" cachingStrategy-ref="Caching_Strategy">
+			<logger level="INFO" doc:name="Started Before Cache inside" doc:id="6fe3e592-f5a4-4874-b690-2e26c763dc0a" message="Started Before Cache inside"/>
+			<http:request method="GET" doc:name="Request" doc:id="50a78aae-9aac-4f1c-ae33-1d3d97ff1c89" config-ref="HTTP_Request_configuration3" path="/us/{pin}">
+				<http:uri-params ><![CDATA[#[{
+	pin : attributes.uriParams.pincode
+}]]]></http:uri-params>
+			</http:request>
+			<logger level="INFO" doc:name="payload" doc:id="a21bb9ef-7dd7-461d-913e-081d7026d760" message="#[payload]"/>
+			<logger level="INFO" doc:name="Ended After Cache inside" doc:id="c9ef377e-b6f6-4863-9c7a-9a245542efa0" message="Ended After Cache inside"/>
+		</ee:cache>
+		<logger level="INFO" doc:name="Ended After Cache outside" doc:id="e153e923-4e64-4243-bff0-e41a24f03575" message="Ended After Cache outside"/>
+	</flow>
+</mule>

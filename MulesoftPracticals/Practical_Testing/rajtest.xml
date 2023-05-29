@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="rajtestFlow" doc:id="294c998b-6806-4ed6-88f0-bdbb187e3ae2" >
+		<http:listener doc:name="Listener" doc:id="ab80a860-9787-46f3-a119-32c1224a6e7b" config-ref="HTTP_Listener_config" path="/raj"/>
+		<logger level="INFO" doc:name="Logger" doc:id="909c1b9d-aad2-41d8-bfac-4e7881f7d1b2" message="#[payload]"/>
+	</flow>
+</mule>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="RoundRobin&amp;FirstSuccesfullFlow" doc:id="c4f69452-bbde-4fb6-849b-57c3697876f6" >
+		<http:listener doc:name="Listener" doc:id="8855af7f-9875-430a-a654-4f54c1e3453b" config-ref="HTTP_Listener_config" path="/roundrobin"/>
+		<logger level="INFO" doc:name="Started RR" doc:id="3238bb47-7326-4999-a5b4-04063fd1a01b" message="Started Round Robin"/>
+		<round-robin doc:name="Round Robin" doc:id="77ff0693-e827-42b8-a6c9-f4117117a9cf" >
+			<route >
+				<http:request method="GET" doc:name="RequestAgify" doc:id="27d5669f-c899-4c0b-8fe3-cf292df152cb" config-ref="HTTP_Request_configuration2" path="?name=melad"/>
+				<logger level="INFO" doc:name="RR Request 1 Agify" doc:id="37705f08-b234-4c93-90d6-6168b875a2a4" message="Request - 1 #[payload]"/>
+				<ee:transform doc:name="Transform Message" doc:id="747bd9ac-7314-461d-9643-0bf6f5a388c2" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</route>
+			<route >
+				<http:request method="GET" doc:name="RequestCatFact" doc:id="d12e818e-7689-439b-9bfa-c0e5532e5066" config-ref="HTTP_Request_configuration" path="/fact"/>
+				<logger level="INFO" doc:name="RR Request 2 CatFact" doc:id="daa5f82d-f293-443f-ba63-e5697f6483f8" message="Request - 2 #[payload]"/>
+				<ee:transform doc:name="Transform Message" doc:id="7754a789-cc38-4198-bb79-4943ca539980" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</route>
+			<route >
+				<http:request method="GET" doc:name="RequestZip" doc:id="55dbaca0-658d-4a11-9ad2-84d785fe2d16" config-ref="HTTP_Request_configuration3" path="/us/33162"/>
+				<logger level="INFO" doc:name="RR Request 3 Zip" doc:id="3ad8ce10-b482-4b3b-9d13-0ef3fd5d0cbc" message="Request - 3 #[payload]"/>
+				<ee:transform doc:name="Transform Message" doc:id="a97399c2-4040-44a6-acc9-715114294524" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</route>
+		</round-robin>
+		<ee:transform doc:name="Transform Message" doc:id="ffff0068-397c-4d60-82af-1ab7cf37e48e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End RR" doc:id="47ca4428-4910-4af0-a69e-e5ae1336e4fc" message="Ended Round Robin"/>
+	</flow>
+	<flow name="RoundRobin&amp;FirstSuccesfullFlow1" doc:id="ef53a330-88d2-442a-9877-b09a31b3d060" >
+		<http:listener doc:name="Listener" doc:id="9c08b276-2df7-49c9-bab3-201fd7afa837" config-ref="HTTP_Listener_config" path="/firstsuc"/>
+		<logger level="INFO" doc:name="Started First Successful" doc:id="14d2677e-c812-4d0b-83b8-276173f9b486" message="Started First Successful..."/>
+		<first-successful doc:name="First Successful" doc:id="01378cf8-1a36-492d-8228-b21becb9b446" >
+			<route >
+				<http:request method="GET" doc:name="Request CatFact" doc:id="13b56140-f854-437c-9beb-d28714157b77" config-ref="HTTP_Request_configuration" path="/fa"/>
+				<logger level="INFO" doc:name="Requested CATFACT FS" doc:id="37002811-49e9-411e-a68f-9518e4c42a46" message="Requested CATFACT FS : #[payload]"/>
+				<ee:transform doc:name="Transform Message" doc:id="79d17d77-436c-4517-bb71-e8ec6be64cbd" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</route>
+			<route >
+				<http:request method="GET" doc:name="Request Agify" doc:id="6e01a08f-2e1a-4533-a8cd-92ec626bcf25" config-ref="HTTP_Request_configuration2" path="?name=meelad"/>
+				<logger level="INFO" doc:name="Requested AGIFY FS" doc:id="108245bc-dce1-4ed6-b956-1286ee27e44e" message="Requested AGIFY FS : #[payload]"/>
+				<ee:transform doc:name="Transform Message" doc:id="91efffe6-8cd5-41a1-93fe-dc8a74545a54" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</route>
+			<route >
+				<http:request method="GET" doc:name="Request Zip" doc:id="dd73043d-407a-4837-a4f2-430820e0c367" config-ref="HTTP_Request_configuration3" path="/us/33162"/>
+				<logger level="INFO" doc:name="Requested ZIP FS" doc:id="0b32c22c-9edb-4430-b63d-a804f2721fe6" message="Requested ZIP FS : #[payload]"/>
+				<ee:transform doc:name="Transform Message" doc:id="f2af4885-c71a-487f-a00b-71c8cc828dff" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</route>
+		</first-successful>
+		<ee:transform doc:name="Transform Message" doc:id="32079971-f59c-4692-a40c-429cce458ce1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Ended First Succesful" doc:id="95aab494-fed0-466c-beea-91d577a7fb82" message="Ended First Succesful"/>
+	</flow>
+</mule>

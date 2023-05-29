@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="ChoiceFlow" doc:id="0f5c5eb5-5de0-4fd4-a22c-489a40fce305" >
+		<http:listener doc:name="Listener" doc:id="f42c3673-7347-40d2-b3c2-1e317547111c" config-ref="HTTP_Listener_config" path="/choice/{age}"/>
+		<choice doc:name="Choice" doc:id="0ed4eed0-b46c-4dd6-994d-e6d4b8b4c8f0" >
+			<when expression="#[attributes.uriParams.age &lt; 18]">
+				<set-payload value="&quot;You Can't Vote ...&quot;" doc:name="Set Payload" doc:id="8b262cbb-fc6c-4d0f-9318-735679cf4362" />
+				<logger level="INFO" doc:name="Logger1" doc:id="af07619a-ffe0-4394-87f7-9e6b9029fea3" message="#[payload]" />
+			</when>
+			<when expression='#[attributes.uriParams.age == "18"]'>
+				<set-payload value='"Welcome You are Voting For First Time ..."' doc:name="Set Payload" doc:id="b0226538-3b12-443a-9618-0f63adea5fd1" />
+				<logger level="INFO" doc:name="Logger" doc:id="89285fba-3fcd-47dc-a886-f66eab099b0b" message="#[payload]"/>
+			</when>
+			<otherwise >
+				<set-payload value='"You Can Vote ..."' doc:name="Set Payload" doc:id="4cca83bd-16a3-402c-a235-0273c5881877" />
+				<logger level="INFO" doc:name="Logger2" doc:id="e2c786cc-1955-4183-8c8b-457a52abe78c" message="#[payload]"/>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="UntilSuccesfulFlow" doc:id="65fe7e82-d160-402f-96cc-5da1d91d548b" >
+		<http:listener doc:name="Listener" doc:id="817a5050-0448-4701-85ef-7296f885f0cf" config-ref="HTTP_Listener_config" path="/untilsucces"/>
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="ee39ae7c-76a0-4fc8-b189-d9e9f2fe6e38" >
+			<http:request method="GET" doc:name="Request" doc:id="e44c4d35-e3d8-4cf2-baa8-53990c0820bb" config-ref="HTTP_Request_configuration" path="/fact"/>
+			<logger level="INFO" doc:name="Logger" doc:id="02081507-5bf1-4b14-b7e8-acc06fa78d71" message="sucessfull............"/>
+		</until-successful>
+	</flow>
+</mule>

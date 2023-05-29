@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="DataWeaveFlow" doc:id="09f38ef2-b146-4504-9695-a2f3ab687139" >
+		<ee:transform doc:name="JSON_SELECTORS (toJSON)" doc:id="fac88f1b-7e31-444b-b284-0b1293ba2f63" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{	
+"SingleValue":payload[0].userId,
+"MultiValue":payload[1].*userId,
+"Index":payload[0],
+"Range":payload[0 to 1],
+"Filter":payload[?("salary">"2000")],
+"KeyName":payload[0].userId.#,
+"Payload":payload,
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="DataWeaveFlow1" doc:id="492901fe-286a-4ee7-a7c9-da5508dd1c22" >
+		<ee:transform doc:name="XML_SELECTORS (toJSON)" doc:id="27411030-bffb-42c7-83b0-384009588c88" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"SingleValue":payload.EMPLOYEE.EMP1.TRANSACTION.FIRST_NAME,
+	"MultiValue":payload.EMPLOYEE.EMP1.TRANSACTION.*FIRST_NAME,
+	"Index":payload.EMPLOYEE[0],
+	"Range":payload.EMPLOYEE[1],
+	"Payload":payload
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="DataWeaveFlow2" doc:id="499d1176-e1d0-414c-a70a-e56d8867c758" >
+		<ee:transform doc:name="JSON_SELECTORS (toXML)" doc:id="8fc50f03-735f-40c5-b838-7c8c17901a82" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+"EMP":{
+	"Index":payload[0],
+	"SingleValue":payload[0].userId,
+	"MultiValue":payload[1].*userId,
+	"Range":payload[0 to 2],
+	"Payload":payload,
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="DataWeaveFlow3" doc:id="ee592f1a-3d34-4a99-814c-3d81c29288b6" >
+		<ee:transform doc:name="XML_SELECTORS (toXML)" doc:id="a66079b6-c69f-4ee5-a43a-3ce0917e6624" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+"EMP":{
+	"Payload":payload,
+	"Index":payload[0],
+	"SingleValue":payload[0].EMP1.TRANSACTION.FIRST_NAME,
+	"MultiValue":payload[0].EMP1.TRANSACTION.*FIRST_NAME,
+	"Range":payload[0].EMP3.TRANSACTION.FIRST_NAME,
+	
+	
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="DataWeaveSelectorsFlow" doc:id="6bb96f9d-39ce-45e7-bd2c-1c123d77cfeb" >
+		<ee:transform doc:name="DynamicSelectors" doc:id="55e75a89-6f4b-47ef-a2aa-d71ad797559b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+/*
+             Dynamic Selector
+The syntax for dynamic selection depends on what you are selecting:
+Single Value: payload[(nameExpression)]
+Multi Value: payload[*(nameExpression)]
+Attribute: payload[@(nameExpression)]
+Key Value: payload[&(nameExpression)]
+Single Value with a Namespace: payload.ns0#"$(nameExpression)"
+ */
+
+
+
+---
+payload[(payload.ref)]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="DataWeaveSelectorsFlow1" doc:id="288f04ff-71ae-4857-95a3-fea282fea281" >
+		<ee:transform doc:name="Namespace Selector" doc:id="4695a0fa-b2c1-4624-a39f-f14e1da728d8" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+
+/*The DataWeave namespace selector supports the use of a name that
+matches a namespace or a local part. To match a namespace, the name
+must match the namespace and the local part. If the name only matches 
+the local part, the selector matches all namespaces with that local 
+part, regardless of the namespace.
+Note that XML namespaces and their prefixes are defined in the xmlns 
+attribute of an XML element. For example, the element 
+<h:table xmlns:h="http://www.w3.org/TR/html4/"/> 
+defines a namespace that assigns the prefix h to the namespace 
+http://www.w3.org/TR/html4/. All elements in that namespace contain 
+the h prefix. For example, in the element <h:table/>, h is the prefix 
+for the namespace, and table is the local part.
+ */
+ 
+output application/xml
+ns html http://www.w3.org/TR/html4/
+ns furniture https://www.w3schools.com/furniture
+ 
+---
+root: {
+     a: payload.root.html#table,
+     b: payload.root.furniture#table
+ }]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="DataWeaveSelectorsFlow2" doc:id="84b93ca5-6b4c-4952-b7a5-d1a21d4dda0a" >
+		<ee:transform doc:name="Attribute Selector" doc:id="5760b148-28fb-4c4d-884a-68db876c3c8e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/dw
+/*
+ The attribute selector returns the first attribute value that 
+ matches the selected name expression.
+ If no key matches, the selection returns the value null.
+ */
+
+---
+payload.menu.@id]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="DataWeaveSelectorsFlow3" doc:id="d296006e-4979-4f9c-9d84-e1247eac764c" >
+		<ee:transform doc:name="Descendant Selector" doc:id="55bcce45-7ea0-412c-9520-7c851cd1e3c7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+/*
+ The descendant selector returns a list of all children and their 
+ descendants. You can directly chain this selector to any other 
+ selector without using a single . , For example, payload.. 
+ recursively returns an array of all the child values, 
+ the values of their children, and so on. You can also 
+ chain the selector to another element (for example, with payload..user)
+ to select the values of each user key and its descendants, 
+ or you can use payload..*name to select the values of all 
+ name descendants.
+ */
+---
+{"key":payload.. ,
+"user":payload..user,
+"name":payload..*name
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

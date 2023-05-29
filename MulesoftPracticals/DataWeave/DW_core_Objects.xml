@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="DW_core_ObjectsFlow" doc:id="11073a25-7ce2-4bd9-ae06-c61c67c53b05" >
+		<ee:transform doc:name="dw::core::Objects" doc:id="59806f1f-5bb7-4c41-810f-7d938f90bd45" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/dw
+import divideBy from dw::core::Objects
+
+/*
+ This module contains helper functions for working with objects. 
+ To use this module, you must import it to your DataWeave code, 
+ for example, by adding the line import * from dw::core::Objects to 
+ the header of your DataWeave script
+ */
+
+var myVar = read('<xml attr="x"><a>true</a><b>1</b></xml>', 'application/xml')
+var obj = {
+  "a": 1,
+  "b": 2,
+  "c": 5,
+  "d": 1
+}
+
+---
+{
+	/*
+	 Breaks up an object into sub-objects that contain the specified number of key-value
+	 pairs.If there are fewer key-value pairs in an object than the specified number,
+	 the function will fill the object with those pairs. If there are more pairs, the 
+	 function will fill another object with the extra pairs.
+	 */
+	"divideBy" : {"a": 1, "b" : true, "a" : 2, "b" : false, "c" : 3} divideBy 2 ,
+	
+	//Returns an array of key-value pairs that describe the key, value, and any 
+	//attributes in the input object.
+	// "entrySet" : entrySet(myVar) ,
+	
+	//Returns true if every entry in the object matches the condition
+	/*
+    a: {} everyEntry (value, key) -> value is String,
+    b: {a: "", b: "123"} everyEntry (value, key) -> value is String,
+    c: {a: "", b: 123} everyEntry (value, key) -> value is String,
+    d: {a: "", b: 123} everyEntry (value, key) -> key as String == "a",
+    e: {a: ""} everyEntry (value, key) -> key as String == "a",
+    f: null everyEntry ((value, key) -> key as String == "a") */
+	
+	//Returns an array of key names from an object.
+	// "keySet" : keySet({ "a" : true, "b" : 1})
+	
+	//Appends any key-value pairs from a source object to a target object. If 
+	//source and target objects have the same key, the function appends that 
+	//source object to the target and removes that target object from the output.
+	// "mergeWith" : { "a" : true, "b" : 1} mergeWith { "a" : false, "c" : "Test"}
+	
+	//Returns an array of keys from an object.
+	//"nameSet" : nameSet({ "a" : true, "b" : 1})
+	
+	//Returns true if at least one entry in the object matches the specified condition.
+	//The function stops iterating after the first element that matches the condition 
+	//is found.
+	/*  a: {} someEntry (value, key) -> value is String,
+    b: {a: "", b: "123"} someEntry (value, key) -> value is String,
+    c: {a: "", b: 123} someEntry (value, key) -> value is String,
+    d: {a: "", b: 123} someEntry (value, key) -> key as String == "a",
+    e: {a: ""} someEntry (value, key) -> key as String == "b",
+    f: null someEntry (value, key) -> key as String == "a"
+	*/
+	
+	//Selects key-value pairs from the object while the condition is met.
+	// obj takeWhile ((value, key) ->  value < 3)
+	
+	//Returns an array of the values from key-value pairs in an object.
+	 //"valueSet" : valueSet({a: true, b: 1})
+
+
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

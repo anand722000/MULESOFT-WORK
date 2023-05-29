@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="TransformAnyToAnyFlow" doc:id="6bf1e4ad-0462-40f1-af6e-a2970578f278" >
+		<http:listener doc:name="Listener" doc:id="54806519-c7d9-4040-a43a-8d846c013b2b" config-ref="HTTP_Listener_config" path="/TransformTo"/>
+		<ee:transform doc:name="Transform Message" doc:id="b2bb4399-eeef-4f2d-ac2e-989536671783" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+/*
+Taking payload from Body request,send body in any data format as your
+choice and choose here output application/dataFormat in which you want
+to transform
+ */ 
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="d5e3507d-0571-49da-9e7d-1c3f4e2aae9c" message="#[payload]"/>
+	</flow>
+</mule>

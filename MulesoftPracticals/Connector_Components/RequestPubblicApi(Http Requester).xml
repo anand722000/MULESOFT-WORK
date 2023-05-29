@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="252f584c-1684-4400-9399-b00485af9264" >
+		<http:request-connection protocol="HTTPS" host="catfact.ninja" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration2" doc:name="HTTP Request configuration" doc:id="3d99d154-8c68-4de4-bf4c-9f13f6562b60" >
+		<http:request-connection protocol="HTTPS" host="api.agify.io" >
+		</http:request-connection>
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration3" doc:name="HTTP Request configuration" doc:id="669b5a64-d0ee-4408-a697-f3648d6f31ba" >
+		<http:request-connection protocol="HTTPS" host="api.zippopotam.us" />
+	</http:request-config>
+	<flow name="RequestPubblicApiFlow" doc:id="04011bfb-9e70-4e2b-9988-d734f7b70e37" >
+		<http:listener doc:name="Listener" doc:id="44e4fe3a-5a3f-45d4-8b21-b703e6d64221" config-ref="HTTP_Listener_config" path="/publicapi"/>
+		<http:request method="GET" doc:name="Request" doc:id="98aa4ee4-fea3-4a6d-959a-d62871bb5ada" config-ref="HTTP_Request_configuration" path="/fact"/>
+		<logger level="INFO" doc:name="Logger" doc:id="66dc40d8-08bc-48d4-9834-0ab25a16ffab" message="#[payload]"/>
+	</flow>
+	<flow name="RequestPubblicApiQueryPara" doc:id="3e566d03-ab9a-4030-adb3-3317bd4e6785">
+		<http:listener doc:name="Listener" doc:id="6a259eea-f8a1-4f0d-9f69-3dfb28aaa2d9" config-ref="HTTP_Listener_config" path="/publicapiqpara"/>
+		<http:request method="GET" doc:name="Request" doc:id="e6ae338d-0e74-45a6-a622-22f7f581f11c" config-ref="HTTP_Request_configuration2" path="?">
+			<http:query-params ><![CDATA[#[{
+	name : attributes.queryParams.myname
+}]]]></http:query-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="19c3874d-5385-477f-a91e-1758e16699ad" message="#[payload]"/>
+	</flow>
+	<flow name="RequestPubblicApi(Http_Requester)Flow" doc:id="ac20a6e2-5599-47ab-ac86-19ade65ea1da" >
+		<http:listener doc:name="Listener" doc:id="ccb4b6d4-2e02-4591-ba4d-727f58a32a77" config-ref="HTTP_Listener_config" path="/publicApiUriPara/{country}/{pincode}" allowedMethods="GET"/>
+		<http:request method="GET" doc:name="Request" doc:id="2cc8051e-9104-48f4-8a6a-f9af8a6723e3" config-ref="HTTP_Request_configuration3" path="/{nation}/{pin}">
+			<http:uri-params ><![CDATA[#[{   nation : attributes.uriParams.country ,
+	pin : attributes.uriParams.pincode
+}]]]></http:uri-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="7305183a-59ac-40bb-90dc-7133adfae655" message="#[payload]"/>
+	</flow>
+</mule>

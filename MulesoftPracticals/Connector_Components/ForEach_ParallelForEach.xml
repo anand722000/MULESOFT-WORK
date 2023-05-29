@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="ForEach_ParallelForEachFlow" doc:id="b0ae0a69-0dea-4c46-8977-95dc0a62405e" >
+		<http:listener doc:name="Listener" doc:id="ce7e9c91-fa9d-44f1-bcfd-78d28930cf7d" config-ref="HTTP_Listener_config" path="/foreach"/>
+		<logger level="INFO" doc:name="Starting" doc:id="8061585a-2b83-49f2-9d91-b0f555f48224" message="Started..."/>
+		<set-payload value="#[[1,2,3,4,5,6,7,8,9]]" doc:name="Set Payload" doc:id="af5eec53-a073-4083-8612-525258834d91" />
+		<foreach doc:name="For Each" doc:id="41d72b4f-623e-48d8-b1bf-779dd21971e0" collection="#[payload]">
+			<ee:transform doc:name="adding 2" doc:id="8ef6513e-dee7-4551-92fd-b48404bc894d" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload + 2]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="printing" doc:id="19d758d8-3437-408e-a22e-daf61afdae40" message="#[payload]"/>
+		</foreach>
+		<ee:transform doc:name="Transform Message" doc:id="9d0f48af-4e93-4444-85c5-e1cd2ca18b5a">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="ending" doc:id="5d0143d1-4f7a-4685-9c0f-eb2f19fe8612" message="#[payload]"/>
+	</flow>
+	<flow name="ForEach_ParallelForEachFlow1" doc:id="dc5e244b-6205-4f88-9dea-51e4bed8fe2e" >
+		<http:listener doc:name="Listener" doc:id="b103c839-6c7b-4980-af54-e9dcfb9a0faa" config-ref="HTTP_Listener_config" path="/parallel/foreach"/>
+		<logger level="INFO" doc:name="Logger" doc:id="eabd13d6-9158-407d-a652-dd68d0b368f0" message="Started ..."/>
+		<set-payload value="#[[0,1,2,3,4,5,6,7,8,9]]" doc:name="Set Payload" doc:id="d4c3bf89-b57c-4d82-92dc-fc1b9d5cd48d" />
+		<parallel-foreach doc:name="Parallel For Each" doc:id="28bd82ff-64e0-4a68-89b7-286dae022186" >
+			<ee:transform doc:name="Transform Message" doc:id="c6fcabe1-36a7-4435-878a-976acc71e89d" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload + 2]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="d06a67ef-fce4-49af-93ce-01034a05956b" message="#[payload]"/>
+		</parallel-foreach>
+		<ee:transform doc:name="Transform Message" doc:id="cbdc7a22-3367-49ed-baea-926d2f8bc7bc" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload..payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="d31628d7-b01f-4e8f-944b-24f41a344725" message="#[payload..payload]"/>
+	</flow>
+</mule>

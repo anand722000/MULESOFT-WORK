@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="DW_COREFlow" doc:id="6306fd6c-3bb2-48f6-aeef-1e9578ea8dc6" >
+		<ee:transform doc:name="Core (dw::Core)" doc:id="22640593-ebb0-40c7-b6b2-374e0dba538c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/dw
+/*
+                   Core (dw::Core)
+This module contains core DataWeave functions for data transformations.
+It is automatically imported into any DataWeave script.
+ */
+ 
+ 
+ 
+  var someString = "something"
+  var nullString = null
+  var myVar = "Hello World!"
+ 
+---
+{
+	//Concatenates two values.
+	"result" : [0, 1, 2] ++ ["a", "b", "c"]  ,
+	"concat" : [aa: "a", bb: "b"] ++ [cc: "c"],
+	"LocalDateTime" : (|2017-10-01| ++ |23:57:59|),
+	
+	//Removes specified values from an input value
+	"a" : [0, 1, 1, 2] -- [1,2]  ,
+	"b" : ["hello" : "world", "name" : "DW"] -- ["hello" : "world"],
+	"c" : ["yes" : "no", "good" : "bad", "old" : "new" ] -- ["yes", "old"],
+	
+	//Returns the absolute value of a number.
+	"abs" : [ abs(-2), abs(2.5), abs(-3.4), abs(3) ],
+	
+	//Returns the average of numbers listed in an array. An array that is empty or that contains 
+	//a non-numeric value results in an error.
+	"avg" : [ a: avg([1, 1000]), b: avg([1, 2, 3]) ],
+	
+	//Rounds a number up to the nearest whole number.
+	"ceil" : [ ceil(1.5), ceil(2.1), ceil(3) ],
+	
+	//Rounds a number down to the nearest whole number.
+	"floor" : [ floor(1.5), floor(2.2), floor(3) ],
+	
+	//Returns true if an input contains a given value, false if not.
+	"contain" : [ 1, 2, 3, 4 ] contains(2) ,
+	
+	//Returns the number of days between two dates.
+	"dayBetween" : [ days : daysBetween('2016-10-01T23:57:59-03:00', '2017-10-01T23:57:59-03:00') ],
+	
+	//Iterates over an array and returns the unique elements in it.
+	"distinct" : [0, 1, 2, 3, 3, 2, 1, 4] distinctBy (value) -> { "unique" : value } ,
+	
+	//Returns true if a string ends with a provided substring, false if not.
+	"endswith" : [ "Mariano" endsWith "no", "Mariano" endsWith "to" ] ,
+	
+	//Iterates over an array and applies an expression that returns matching values.
+	"filter" : [9,2,3,4,5] filter (value, index) -> (value > 2) ,
+	"filter1" : [9, 2, 3, 4, 5] filter (($$ > 1) and ($ < 5)),
+	"filter2" :  "hello world" filter ($$ mod 2) == 0 ,
+	
+	//Iterates a list of key-value pairs in an object and applies an expression that returns 
+	//only matching objects, filtering out the rest from the output.
+	"filterObject" : {"a" : "apple", "b" : "banana"} filterObject ((value) -> value == "apple") ,
+	"filterObject2" : {"letter1": "a", "letter2": "b", "id": 1} filterObject ((value, key) -> key startsWith "letter"),
+	"filterObject3" : { "1": "a", "2": "b", "3": "c"} filterObject ((value, key, index) -> index < 1),
+	"filterObject4" : { str1 : "String 1", str2 : "String 2", str3 : null, str4 : "String 4"} filterObject $ != null ,
+	
+	//Returns indices of an input that match a specified value.
+	"find" : ["Bond", "James", "Bond"] find "Bond" ,
+	"find1" : "I heart DataWeave" find /\w*ea\w*(\b)/ ,
+	"find2" : "aabccdbce" find "a" ,
+	
+	//Iterates over each item in an array and flattens the results.
+	"flatMap" : [ [3,5], [0.9,5.5] ] flatMap (value, index) -> value ,
+	/*
+	Instead of returning an array of arrays (as map does when you iterate over the values within an 
+	input like [ [1,2], [3,4] ]), flatMap returns a flattened array that looks like this: [1, 2, 3, 4]. 
+	flatMap is similar to flatten, but flatten only acts on the values of the arrays, while flatMap can 
+	act on values and indices of items in the array.
+	 */
+	
+	//Turns a set of subarrays (such as [ [1,2,3], [4,5,[6]], [], [null] ]) into a single, 
+	//flattened array (such as [ 1, 2, 3, 4, 5, [6], null ]).Note that it flattens only the 
+	//first level of subarrays and omits empty subarrays.
+	"flatten" : flatten([ [1,2,3], [4,5,[6]], [], [null] ]) ,
+	
+	//Returns an object that groups items from an array based on specified criteria, 
+	//such as an expression or matching selector.
+	"groupby" : ["a","b","c"] groupBy (item, index) -> index ,
+	
+	//Returns the index of the first occurrence of the specified element in this array, 
+	//or -1 if this list does not contain the element.
+	"indexof" : [ present: ["a","b","c","d"] indexOf "c",
+                  notPresent: ["x","w","x"] indexOf "c",
+                  presentMoreThanOnce: ["a","b","c","c"] indexOf "c", ],
+                  
+    //Returns the index of the last occurrence of the specified element in a given array 
+    //or -1 if the array does not contain the element.
+    present: ["a","b","c","d"] lastIndexOf "c",
+   notPresent: ["x","w","x"] lastIndexOf "c",
+   presentMoreThanOnce: ["a","b","c","c"] lastIndexOf "c",
+                  
+   //Returns true if the given string is empty (""), completely composed of whitespaces, or null. 
+   //Otherwise, the function returns false. 
+  "isblank" : ["emptyString" : isBlank(""),
+  "stringWithSpaces" : isBlank("      "),
+  "textString" : isBlank(someString),
+  "somePayloadValue" : isBlank(payload.nonExistingValue),
+  "nullString" : isBlank(nullString),
+  // checking if the string is not blank
+  "notEmptyTextString" : not isBlank(" 1234"),
+  "notEmptyTextStringTwo" : ! isBlank("") ] ,
+                  
+   //Returns true if the given number contains a decimal, false if not.
+   "isDecimal" : [ isDecimal(1.1), isDecimal(1), isDecimal("1.1") ] ,
+   
+   //Returns true if the given input value is empty, false if not.
+   "isEmpty" : [ isEmpty([]), isEmpty([1]) ] ,
+   
+   //Returns true if the number or numeric result of a mathematical operation is even, false if not
+   "isEven" : [ isEven(0), isEven(1), isEven(1+1) ] ,
+   
+   //Returns true if the number or numeric result of a mathematical operation is odd, false if not.
+   "isOdd" : [ isOdd(0), isOdd(1), isOdd(2+2) ] ,
+   
+   //Returns true if the given number is an integer (which lacks decimals), false if no
+   "isInteger" : [isInteger(1), isInteger(2.0), isInteger(2.2), isInteger("1")] ,
+   
+   //Returns true if it receives a date for a leap year, false if not.
+   "isLeap" : [ isLeapYear(|2016-10-01T23:57:59|), isLeapYear(|2017-10-01T23:57:59|) ] ,
+   
+   //Merges an array into a single string value and uses the provided string as a separator between each 
+   //item in the list.Note that joinBy performs the opposite task of splitBy.
+   "hyphenate" : ["a","b","c"] joinBy "-" ,
+   
+   //Returns an array of keys from key-value pairs within the input object.
+   //The returned keys belong to the Key type. To return each key as a string, you can use namesOf, instead.
+   "keysOf" : keysOf({ "a" : true, "b" : 1}) ,
+   
+   /*
+    Without changing the value of the input, log returns the input as a system log.
+    So this makes it very simple to debug your code, because any expression or subexpression 
+    can be wrapped with log and the result will be printed out without modifying the result of the expression. 
+    The output is going to be printed in application/dw format.
+    */
+    "log" : log("WARNING", "Houston, we have a problem") ,
+   
+   //Returns the provided string in lowercase characters.
+   "name" : lower("MULESOFT") ,
+   
+   //Returns the provided string in uppercase characters.
+   "name" : upper("mulesoft") ,
+   
+   //Iterates over items in an array and outputs the results into a new array.
+   "map" : ["jose", "pedro", "mateo"] map (value, index) -> { (index) : value} ,
+   "map1" : ['joe', 'pete', 'matt'] map ( "$$" : $) ,
+   
+   //Iterates over an object using a mapper that acts on keys, values, or indices of that object.
+   "mapObject" : {"a":"b","c":"d"} mapObject (value,key,index) -> { (index) : { (value):key} } ,
+   
+   //Returns the highest Comparable value in an array.The items must be of the same type, or 
+   //the function throws an error. The function returns null if the array is empty.
+   "max" : { a: max([1, 1000]), b: max([1, 2, 3]), c: max([1.5, 2.5, 3.5]) } ,
+   
+   //Iterates over an array and returns the highest value of Comparable elements from it.
+   //The items must be of the same type. maxBy throws an error if they are not, and the function returns null 
+   //if the array is empty.
+   "maxby" : [ { "a" : 1 }, { "a" : 3 }, { "a" : 2 } ] maxBy ((item) -> item.a) ,
+   
+   //Returns the lowest Comparable value in an array.The items must be of the same type or min throws an error. 
+   //The function returns null if the array is empty.
+   "min" : { a: min([1, 1000]), b: min([1, 2, 3]), c: min([1.5, 2.5, 3.5]) } ,
+   
+   //Iterates over an array to return the lowest value of comparable elements from it.
+   //The items need to be of the same type. minBy returns an error if they are not, and
+   //it returns null when the array is empty.
+   "minBy" : [ { "a" : 1 }, { "a" : 2 }, { "a" : 3 } ] minBy (item) -> item.a ,
+   
+   //Returns the modulo (the remainder after dividing the dividend by the divisor).
+   "mod" : [ (3 mod 2), (4 mod 2), (2.2 mod 2) ] ,
+   
+   //Returns an array of strings with the names of all the keys within the given object.
+   "nameof" : { "namesOf" : namesOf({ "a" : true, "b" : 1}) } ,
+   
+   //Returns a DateTime value for the current date and time.
+   "now" :{
+   nowCalled: now(),
+   nowCalledSpecificTimeZone: now() >> "America/New_York",
+   epochTime : now() as Number,
+  nanoseconds: now().nanoseconds,
+  milliseconds: now().milliseconds,
+  seconds: now().seconds,
+  minutes: now().minutes,
+  hour: now().hour,
+  day: now().day,
+  month: now().month,
+  year: now().year,
+  quarter: now().quarter,
+  dayOfWeek: now().dayOfWeek,
+  dayOfYear: now().dayOfYear,
+  offsetSeconds: now().offsetSeconds,
+  formattedDate: now() as String {format: "y-MM-dd"},
+  formattedTime: now() as String {format: "hh:m:s"} },
+   
+   /*
+    Reorders the elements of an input using criteria that acts on selected elements of that input.
+    This version of orderBy takes an object as input. Other versions act on an input array or handle a null value.
+    Note that you can reference the index with the anonymous parameter $$ and the value with $. */
+   "orderby" : [{ letter: "e" }, { letter: "d" }] orderBy($.letter) ,
+   "orderDescending" : [3,8,1] orderBy -$ ,
+   "orderby1" : [3,2,3] orderBy $ ,
+   "orderby2" : [{name: "Santiago", age: 42},{name: "Leandro", age: 29}, {name: "Mariano", age: 35}] orderBy (person) -> person.age ,
+   
+   /*
+    Useful for mapping an object into an array, pluck iterates over an object and returns an array of keys, 
+   values, or indices from the object.It is an alternative to mapObject, which is similar but returns an object, 
+   instead of an array.
+    */
+   "pluck" : {"a":"b","c":"d"} pluck (value,key,index) -> { (index) : { (value):key} } ,
+   
+   //Raises the value of a base number to the specified power.
+   "power" : [ (2 pow 3), (3 pow 2), (7 pow 3) ] ,
+   
+   //Returns a pseudo-random number greater than or equal to 0.0 and less than 1.0.
+   "random" : { price: random() * 1000 } ,
+   
+   //Returns a pseudo-random whole number from 0 to the specified number (exclusive).
+   "randomint" : { price: randomInt(1000) } ,
+   
+   //Rounds a number up or down to the nearest whole number.
+   "round" : [ round(1.2), round(4.6), round(3.5) ] ,
+   
+   //Returns the number of elements in an array. It returns 0 if the array is empty.
+   "sizeof" : sizeOf([ "a", "b", "c"]) ,
+    "arraySizes": {
+     size3: sizeOf([1,2,3]),
+     size2: sizeOf([[1,2,3],[4]]),
+     size0: sizeOf([]) } ,
+     "sizeof2" : sizeOf({a: 1, b: 2}) ,
+     objectSizes : {
+     sizeIs2: sizeOf({a:1,b:2}),
+     sizeIs0: sizeOf({}) },
+     sizeOfSting2 : sizeOf("my string"),
+     sizeOfEmptyString: sizeOf(""),
+     sizeOfNumber : sizeOf("123" as Number) ,
+     
+     //Splits a string into a string array based on a value that matches part of that string. 
+     //It filters out the matching part from the returned array.
+   "splitters" : {
+   "split1" : "a-b-c" splitBy(/^*.b./),
+   "split2" : "hello world" splitBy(/\s/),
+   "split3" : "no match" splitBy(/^s/),
+   "split4" : "no match" splitBy(/^n../),
+   "split5" : "a1b2c3d4A1B2C3D" splitBy(/^*[0-9A-Z]/),
+   "split6" : "192.88.99.0" splitBy(".") ,
+   "split1" : "a-b-c" splitBy("-"),
+    "split2" : "hello world" splitBy(""),
+    "split3" : "first,middle,last" splitBy(","),
+    "split4" : "no split" splitBy("NO")  } ,
+    
+    //Returns the square root of a number.
+    "sqrt" : [ sqrt(4), sqrt(25), sqrt(100) ] ,
+    
+    //Returns true or false depending on whether the input string starts with a matching prefix.
+    "StartsWith" : [ "Mari" startsWith("Mar"), "Mari" startsWith("Em") ] ,
+    
+    //Returns the sum of numeric values in an array.Returns 0 if the array is empty and 
+    //produces an error when non-numeric values are in the array.
+   "Sum" : sum([1, 2, 3]) ,
+   
+   //This function works as a pipe that passes the value returned from the preceding expression 
+   //to the next (a callback) only if the value returned by the preceding expression is not null.
+   "then":{
+    "chainResult": ["mariano", "de Achaval"]
+            reduce ((item, accumulator) -> item ++ accumulator)
+            then ((result) -> sizeOf(result)),
+    "referenceResult" : ["mariano", "de Achaval"]
+                         map ((item, index) -> upper(item))
+                         then {
+                            name: $[0],
+                            lastName: $[1],
+                            length: sizeOf($)
+                        },
+    "onNullReturnNull": []
+                reduce ((item, accumulator) -> item ++ accumulator)
+                then ((result) -> sizeOf(result))    } ,
+      
+     //Returns a range with the specified boundaries. The upper boundary is inclusive. 
+     "to" :{
+     	myRange: 1 to 10 ,
+     	indices2to6 : myVar[2 to 6],
+        indicesFromEnd : myVar[6 to -1],
+        reversal : myVar[11 to -0]  }   ,    
+   
+   //Removes any blank spaces from the beginning and end of a string.
+   "trim": "my really long  text" ,
+    "null": trim(null),
+  "empty": trim(""),
+  "blank": trim("     "),
+  "noBlankSpaces": trim("abc"),
+  "withSpaces": trim("    abc    ") ,
+  
+  //Returns the type of a value.
+  "typeOf": [ typeOf("A b"), typeOf([1,2]), typeOf(34), typeOf(true), typeOf({ a : 5 }) ] ,
+  
+  //Performs the opposite of zip. It takes an array of arrays as input.The function groups the values of 
+  //the input sub-arrays by matching indices, and it outputs new sub-arrays with the values of those matching indices. 
+  //No sub-arrays are produced for unmatching indices. 
+  "unzip1" : unzip([ [0,"a"], [1,"b"], [2,"c"],[ 3,"d"] ]) ,
+  "unzip2" : unzip([ [0,"a"], [1,"a","foo"], [2], [3,"a"] ])  ,  
+   
+   
+   //Returns the provided string in uppercase characters.
+    "name" : upper("mulesoft") ,
+    
+    //Returns a v4 UUID using random numbers as the source.
+    "uuid" : uuid() ,
+    
+    //Returns an array of the values from key-value pairs in an object.
+    "valuesOf" : valuesOf({a: true, b: 1}) ,
+    
+    //Merges elements from two arrays into an array of arrays.The first sub-array in the output array contains 
+    //the first indices of the input sub-arrays. The second index contains the second indices of the inputs, 
+    //the third contains the third indices, and so on for every case where there are the same number of indices 
+    //in the arrays.
+     "a" : [0, 1, 2, 3] zip ["a", "b", "c", "d"],
+     "b" : [0, 1, 2, 3] zip ["a"],
+     "c" : [0, 1, 2, 3] zip ["a", "b"],
+     "d" : [0, 1, 2] zip ["a", "b", "c", "d"]
+ 
+}
+
+
+
+
+
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

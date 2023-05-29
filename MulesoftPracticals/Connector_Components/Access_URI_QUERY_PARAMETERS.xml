@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="126be0cf-181d-4dcf-a380-4db46d78cf1f" >
+		<http:request-connection host="genderize.io/" protocol="HTTPS"/>
+	</http:request-config>
+	<flow name="Http_Request_URI_PARAMETERS" doc:id="cc6c240c-24de-4ea3-9ad8-88f59984febf">
+		<http:listener doc:name="Listener" doc:id="e37a20ee-cfa3-4315-a11e-2a17518a8ca4" config-ref="HTTP_Listener_config" path="/uriparam/{name}/{age}" />
+		<logger level="INFO" doc:name="Logger" doc:id="6e0c0790-3246-4d2c-9f09-65fc523a84df" message='#["Hello " ++ attributes.uriParams.name ++ " your Age is : " ++ attributes.uriParams.age]'/>
+	</flow>
+	<flow name="Http_Request_QUERY_Para" doc:id="c914543f-4909-4715-8051-6dfb9cf33396">
+		<http:listener doc:name="Listener" doc:id="6a934e63-bddd-442d-bae6-a1e6c9070d74" config-ref="HTTP_Listener_config" path="/queryparam" />
+		<logger level="INFO" doc:name="Logger" doc:id="e65c478a-3922-4ac8-b973-4c74557ccf8f" message='#["Hello " ++ attributes.queryParams.name ++ " your Age is : " ++ &#10;attributes.queryParams.age]'/>
+	</flow>
+</mule>

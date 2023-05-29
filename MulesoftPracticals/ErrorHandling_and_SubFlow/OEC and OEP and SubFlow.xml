@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="OnErrorContinue_and_SubFlow" doc:id="4ab7a5bb-7594-4efb-aba5-d9c9afaf3da3" >
+		<http:listener doc:name="Listener" doc:id="02e7f97b-4003-4084-b89d-9b0d07623b29" config-ref="HTTP_Listener_config" path="/onerrorcontinuesf" />
+		<logger level="INFO" doc:name="Logger" doc:id="8abeaef6-d4f0-43b0-bfc5-7b4cfcd6b968" message="#[payload]" />
+		<flow-ref doc:name="Flow Reference(Calling SubFlow)" doc:id="98576568-1532-41c9-a632-ef8f338519ba" name="SubFlowOfDivision"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="bd6d5355-52bc-41a5-ad07-22f790b726a3" >
+				<logger level="INFO" doc:name="Logger" doc:id="80e8d408-f78e-43b0-880f-db5b2124de45" message="#[error.description]" />
+				<ee:transform doc:name="Send Response Back (it will send)" doc:id="7e7b20c6-f7d7-474e-9fe2-d08cf8f0a61a" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"errorDescription" : error.description ,
+	"errorType" : error.errorType ,
+	"errorUsing" : "OnErrorContinue"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<sub-flow name="SubFlowOfDivision" doc:id="52e1680d-1cfe-4368-99a9-981dce696f06">
+		<ee:transform doc:name="Dividing" doc:id="c2b7fd8c-77c9-44df-bc48-2ac23210117c">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/dw
+---
+{
+	"dividing" : (payload.var1)/(payload.var2)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger1" doc:id="c8616fe7-9e94-4791-85fa-07a5ac4d1a7b" message="#[payload]" />
+	</sub-flow>
+	<flow name="OnErrorPropagate_and_SubFlow" doc:id="1ff6d1d0-8c83-4cb6-a083-9a560c13ef9e" >
+		<http:listener doc:name="Listener" doc:id="0662db54-d70c-4179-8de4-c22f75368b0e" config-ref="HTTP_Listener_config" path="/onerrorpropagatesf" />
+		<logger level="INFO" doc:name="Logger" doc:id="76da5455-7fcb-4333-b6a0-acc45926cedb" message="#[payload]" />
+		<flow-ref doc:name="Flow Reference(Calling SubFlow)" doc:id="d1014835-b234-40ee-8926-cf65700563b1" name="SubFlow(withOwnErrorHandling)_Try"/>
+	</flow>
+	<sub-flow name="SubFlow(withOwnErrorHandling)_Try" doc:id="1c101935-ed0a-453c-baed-4f4f932e6fbc" >
+		<try doc:name="Try" doc:id="5d2dee44-0fd4-49ab-a539-08fc0793f2b0" >
+			<ee:transform doc:name="Dividing" doc:id="52a5de77-717b-4783-8375-2a427f700c1d">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"dividing" : (payload.var1)/(payload.var2)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="d974de12-a61c-4c19-a353-3b0ed93a38fb" message="#[payload]"/>
+			<error-handler >
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="088b7709-65bc-4877-aee2-bc2aac0de40c" >
+					<logger level="INFO" doc:name="Logger" doc:id="04c853ec-3c2d-4ff7-b8c2-69e1b474c4ee" message="#[error.description]" />
+					<ee:transform doc:name="Send Response Back (it will not send)" doc:id="7b85737c-6daa-4721-a7b1-6f63098631a4">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"errorDescription" : error.description ,
+	"errorType" : error.errorType ,
+	"errorUsing" : "OnErrorPropagate"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				</on-error-propagate>
+			</error-handler>
+		</try>
+	</sub-flow>
+</mule>

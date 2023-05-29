@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="assign2secondpartFlow" doc:id="bd2ec727-be89-4b53-8317-7ffe901839f2" >
+		<http:listener doc:name="Listener" doc:id="76524cfc-a712-407d-80d3-d6c41954401a" path="/assign" config-ref="HTTP_Listener_config"/>
+		<file:read doc:name="Read" doc:id="7b9f40a1-3405-4336-b937-94296ca28fef" path="emp.xml"/>
+		<ee:transform doc:name="Transform Message" doc:id="eef49e7f-a1cc-4383-83a5-af2e6db7b71a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="e295068f-3943-4f0a-99b5-6840d6753991" message="#[payload]"/>
+	</flow>
+</mule>

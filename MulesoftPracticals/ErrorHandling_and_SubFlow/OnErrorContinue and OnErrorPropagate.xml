@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="OnErrorContinue" doc:id="b66b15b5-5134-4459-b4a9-277ebf6544d9" >
+		<http:listener doc:name="Listener" doc:id="0d0de294-6a99-4630-911f-f218c74c267f" config-ref="HTTP_Listener_config" path="/onerrorcontinue"/>
+		<logger level="INFO" doc:name="Logger" doc:id="ab31a544-1f93-4c0c-8a35-6a08401ba319" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="d13c4143-cbe2-4675-be94-92f9aa3a46fb" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/dw
+
+---
+{
+	"Dividing" : (payload.var1)/(payload.var2)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="e63a2551-a36b-4337-8386-c78216170a50" message="#[payload]"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="5369752d-5e28-4e7f-babd-c779c9d4f5d6" >
+				<logger level="INFO" doc:name="Logger" doc:id="2045506d-56b6-460d-906a-2eb7371f51ef" message="#[error.description]"/>
+				<ee:transform doc:name="Send Response Back (it will send)" doc:id="b6d6939a-3661-4282-91db-8a340c86547e">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"errorDescription" : error.description ,
+	"errorType" : error.errorType ,
+	"errorUsing" : "OnErrorContinue"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="OnErrorPropagate" doc:id="5405ac54-f887-47b6-9b77-d67792744894" >
+		<http:listener doc:name="Listener" doc:id="128f1fed-7358-4a37-bac7-46f9e8ea8587" config-ref="HTTP_Listener_config" path="/onerrorpropagate"/>
+		<logger level="INFO" doc:name="Logger" doc:id="b92348f2-182f-4334-820d-a53076a06e82" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="5fe839a1-462b-4973-8d4f-437e11d5adc2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/dw
+---
+{
+	"dividing" : (payload.var1)/(payload.var2)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="325bef49-3555-4344-a2c7-7f9e3b0adc87" message="#[payload]"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="46feda95-8fed-4c42-ab62-23b186124cff" >
+				<logger level="INFO" doc:name="Logger" doc:id="8dae6319-41bd-447a-8505-0438db800ffb" message="#[error.description]"/>
+				<ee:transform doc:name="Send Response Back (it will not send)" doc:id="25349dd0-eb0e-47ec-80ee-5fba67f7556c" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"errorDescription" : error.description ,
+	"errorType" : error.errorType ,
+	"errorUsing" : "OnErrorPropagate"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>

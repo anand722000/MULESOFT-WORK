@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="RaiseError_ErrorHandlerFlow" doc:id="f2bbadae-a270-4217-bbab-2d6db979f06a" >
+		<http:listener doc:name="Listener" doc:id="2439cee1-8d1c-4daa-8a3e-69bbb5e7e0ae" config-ref="HTTP_Listener_config" path="/raiseerror"/>
+		<logger level="INFO" doc:name="Logger" doc:id="c363c8ea-a711-42a4-afba-731d25635c10" message="payload"/>
+		<flow-ref doc:name="Flow Reference" doc:id="8af23fd3-4016-452c-a687-ed3cd3ab628b" name="RaiseError_SubFlow"/>
+	</flow>
+	<sub-flow name="RaiseError_SubFlow" doc:id="34e3e5a4-d357-4f85-b160-8872343be38c" >
+		<try doc:name="Try" doc:id="21eb694f-4fe8-4a35-baf5-7adf610ecd49" >
+			<choice doc:name="Choice" doc:id="05d28b7f-1c4b-44a9-aa82-85f488556b69">
+			<when expression="#[typeOf(payload.var1) == String]">
+				<raise-error doc:name="Raise error" doc:id="ce75fdf5-a6d6-49f9-b869-fc3ef7ec1c47" type="MATH:STRING_EXCEPTION" description="Give relevant value to perform arithmetc operation" />
+			</when>
+			<otherwise>
+				<ee:transform doc:name="Transform Message" doc:id="77b1e916-50d2-4771-81bc-d8924109c477">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"dividing" : (payload.var1)/(payload.var2)
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="31c69cc7-5cd4-4bce-b3b5-61c7cf5d389d" message="#[payload]" />
+			</otherwise>
+		</choice>
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="e081058f-afe2-407d-86b8-ffcc2f0d9f68" type="MATH:STRING_EXCEPTION">
+					<logger level="INFO" doc:name="Logger" doc:id="7b5407b9-626f-4b71-abcd-567a05a77a3a" message="#[error.description]"/>
+				</on-error-continue>
+			</error-handler>
+		</try>
+	</sub-flow>
+	<error-handler name="ErrorHandler" doc:id="6f03748a-e77f-4daf-b66e-808d5c559df1" >
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="76fefc9a-ab1e-4259-8013-4eb4833e3abb" >
+			<logger level="INFO" doc:name="Logger" doc:id="ea09a8e6-2ef6-43e6-85bf-84acb504dc75" message="#[error.errorType]"/>
+		</on-error-continue>
+	</error-handler>
+</mule>

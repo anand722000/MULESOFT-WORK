@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="CreateTable" doc:id="8f20a894-8eca-4d95-b730-15db629a3928" >
+		<http:listener doc:name="Listener" doc:id="06b0881a-399c-4e8c-b39c-8f8d7893abe3" config-ref="HTTP_Listener_config" path="/ddlcreatetable"/>
+		<db:execute-ddl doc:name="Execute DDL" doc:id="5b6946cc-63fe-40bf-ae23-cad5f77c5faa" config-ref="Database_Config">
+			<db:sql ><![CDATA[CREATE TABLE Emp_Info (
+    id INT PRIMARY KEY,
+    name VARCHAR(50),
+    mobile INT,
+    address VARCHAR(50)
+)
+]]></db:sql>
+		</db:execute-ddl>
+		<logger level="INFO" doc:name="Logger" doc:id="2b82174d-d29a-46de-a903-b1f8499fda60" message="Table Created Succesfully . . ."/>
+	</flow>
+	<flow name="AlterTable" doc:id="0ad069b4-fe32-4ecc-98f3-52a1867ee461" >
+		<http:listener doc:name="Listener" doc:id="6f795832-071f-42da-a194-14b75942f8bf" config-ref="HTTP_Listener_config" path="/ddlalter"/>
+		<db:execute-ddl doc:name="Execute DDL" doc:id="3672ec14-1fd6-4de1-8f22-70343856efc0" config-ref="Database_Config">
+			<db:sql ><![CDATA[ALTER TABLE emp_info
+ADD Email varchar(255)]]></db:sql>
+		</db:execute-ddl>
+		<logger level="INFO" doc:name="Logger" doc:id="764e91c5-4477-4c7b-9cc1-23fbe8651de7" message="Changes are made in Table . . . "/>
+	</flow>
+	<flow name="DROP" doc:id="c4957a42-c519-4dd6-967a-48d0e8607464" >
+		<http:listener doc:name="Listener" doc:id="a067abb9-3680-44d2-898b-426cbafb6955" config-ref="HTTP_Listener_config" path="/ddldrop"/>
+		<db:execute-ddl doc:name="Execute DDL" doc:id="01d2bb9d-ff3a-424a-8929-8f27a944422e" config-ref="Database_Config">
+			<db:sql ><![CDATA[DROP TABLE table_name]]></db:sql>
+		</db:execute-ddl>
+		<logger level="INFO" doc:name="Logger" doc:id="8df221d2-521e-423e-9a7c-69dbdef680fb" message="Table Deleted Succesfully . . ."/>
+	</flow>
+</mule>

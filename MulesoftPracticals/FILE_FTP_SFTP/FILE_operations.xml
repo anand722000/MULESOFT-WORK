@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<file:config name="File_Config2" doc:name="File Config" doc:id="08b44e1a-75a3-42ce-90c0-7f62cf922dc9" >
+		<file:connection workingDir="C:\Users\ASING834\Desktop\Temp\FileOperations" />
+	</file:config>
+	<flow name="READ_FILE_operationsFlow" doc:id="c4ffeb1e-31a2-4542-be90-326c4345f608" >
+		<http:listener doc:name="Listener" doc:id="8609b7ad-2f6a-483b-abeb-f9c71d3bff1d" config-ref="HTTP_Listener_config" path="/fileread"/>
+		<file:read doc:name="Read" doc:id="8d9e602d-a053-48fa-887d-fe893fbb730c" path="read.txt" config-ref="File_Config2"/>
+		<logger level="INFO" doc:name="Logger" doc:id="799d1d0d-e9a2-4932-9d14-75b62dd76901" message="#[payload]"/>
+	</flow>
+	<flow name="WRITE_FILE_operationsFlow" doc:id="980de62d-6b9c-4d3b-ab0a-29d8b83b84ba" >
+		<http:listener doc:name="Listener" doc:id="2747f569-7484-41a5-bea7-ca326f6c29c6" config-ref="HTTP_Listener_config" path="/filewrite"/>
+		<file:write doc:name="Write" doc:id="25b57fd5-cc50-445b-8cef-a8237990a6be" config-ref="File_Config2" path="write.txt" createParentDirectories="false">
+			<file:content ><![CDATA["Writing something in this file . . ."]]></file:content>
+		</file:write>
+		<logger level="INFO" doc:name="Logger" doc:id="8bfebd9f-6a18-46d8-bbcc-54d1aa72ae7e" message='"Succesful written in file . . ."'/>
+	</flow>
+	<flow name="DELETE_FILE_operationsFlow1" doc:id="b89d35ee-5424-4097-8265-445d2f7e7b82" >
+		<http:listener doc:name="Listener" doc:id="fd921fae-047d-4da8-ab02-0b603696a4dc" config-ref="HTTP_Listener_config" path="/filedelete"/>
+		<file:delete doc:name="Delete" doc:id="9d88e2f5-6e7b-49db-a759-b7b856dd2f6a" config-ref="File_Config2" path="deleteme.txt"/>
+		<logger level="INFO" doc:name="Logger" doc:id="a7a6269a-d9ca-4d15-9f49-c61820d4941f" message='"File Deleted Succesfully . . ."'/>
+	</flow>
+	<flow name="RENAME_FILE_operationsFlow" doc:id="2e58e0c0-4349-4797-9e92-ba88d1c5fdc0" >
+		<http:listener doc:name="Listener" doc:id="f6c3d8f3-1091-4e0b-8f3b-803b552638a3" config-ref="HTTP_Listener_config" path="/filerename"/>
+		<file:rename doc:name="Rename" doc:id="bfd7a6f0-d130-4541-bd7b-8232896a23cc" config-ref="File_Config2" path="rename.txt" to="RENAMED.TXT"/>
+		<logger level="INFO" doc:name="Logger" doc:id="70234743-b64b-427b-baf6-1bd45e2d85bb" message='"File Renamed from lowercase to uppercase . . ."'/>
+	</flow>
+	<flow name="MOVE_FILE_operationsFlow1" doc:id="2799d232-9064-4ea6-ba85-0b263ae2c21d" >
+		<http:listener doc:name="Listener" doc:id="0c3c5d8a-35f0-44e2-ad60-1fe608432e04" config-ref="HTTP_Listener_config" path="/filemove"/>
+		<file:move doc:name="Move" doc:id="3ac92856-ec21-4bec-806a-10760acb1c00" config-ref="File_Config2" sourcePath="C:\Users\ASING834\Desktop\Temp\FileOperations\moveme.txt" targetPath="C:\Users\ASING834\Desktop\Temp\FileOperations\MOVE_IN" createParentDirectories="false"/>
+		<logger level="INFO" doc:name="Logger" doc:id="78ea00cc-e1f2-4431-a0fa-647f00b1d975" message='"moveme.txt file is moved to MOVE_IN folder . . ."'/>
+	</flow>
+	<flow name="CREATE_DIRECTORY_FILE_operationsFlow" doc:id="62c2c768-714f-4ebd-8d31-e2d4fa1bf01b" >
+		<http:listener doc:name="Listener" doc:id="fc2d3234-4831-4a4e-aaa1-cbdab20c1f37" config-ref="HTTP_Listener_config" path="/filecreatedirectory"/>
+		<file:create-directory doc:name="Create directory" doc:id="a4ec4eba-9d83-4c67-a6db-edaafbcb5338" config-ref="File_Config2" directoryPath="NEW_DIRECTORY_CREATED"/>
+		<logger level="INFO" doc:name="Logger" doc:id="1d7682df-6408-4b3e-b4cb-43c344178ea9" message='"Directory Created Succesfully . . ."'/>
+	</flow>
+	<flow name="COPY_FILE_operationsFlow1" doc:id="f609e3f6-84c0-46b3-8099-8a181dab461a" >
+		<http:listener doc:name="Listener" doc:id="6abd4d8e-abad-40f5-974c-a98be3c6271a" config-ref="HTTP_Listener_config" path="/filecopy"/>
+		<file:copy doc:name="Copy" doc:id="94754105-f2d7-40fd-839e-8619c159a6ec" config-ref="File_Config2" sourcePath="C:\Users\ASING834\Desktop\Temp\FileOperations\copyme.txt" targetPath="C:\Users\ASING834\Desktop\Temp\FileOperations\MOVE_IN" createParentDirectories="false" renameTo="COPIED_TO_MOVE_IN_FOLDER_&amp;_Renamed"/>
+		<logger level="INFO" doc:name="Logger" doc:id="7974deb0-fa9b-411d-b9dc-505381a276ad" message='"File Copied to MOVE_IN Folder . . ."'/>
+	</flow>
+	<flow name="LIST_FILE_operationsFlow" doc:id="72d27424-8eed-4358-9a87-84bdbe09e51f" >
+		<http:listener doc:name="Listener" doc:id="99f93e25-5688-4f68-9878-4567c8b57fde" config-ref="HTTP_Listener_config" path="/filelisting"/>
+		<file:list doc:name="List" doc:id="0bbdea1a-7328-4d5c-852a-51e43195c4b9" config-ref="File_Config2" directoryPath="C:\Users\ASING834\Desktop\Temp\FileOperations"/>
+		<logger level="INFO" doc:name="Logger" doc:id="1625e2dc-3b8e-4b11-b24f-b9d0484a69cf" message="#[payload]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="b07fd1bd-b4d1-48d4-a4dd-1c16fe130599" message='"Files are Listed . . ."'/>
+	</flow>
+	<flow name="FILE_operationsFlow1" doc:id="a79751c7-19d6-4191-8ac8-cafe1889ac2b" >
+		<file:listener doc:name="On New or Updated File" doc:id="cd364b1f-822a-449f-a291-8ae194c8ba4e" config-ref="File_Config2" directory="C:\Users\ASING834\Desktop\Temp\FileOperations\ON NEW OR UPDATE" autoDelete="true">
+			<scheduling-strategy >
+				<fixed-frequency frequency="1" timeUnit="MINUTES"/>
+			</scheduling-strategy>
+		</file:listener>
+		<logger level="INFO" doc:name="Logger" doc:id="7f0ad287-a76c-4c58-9ae0-814f38c23b1e" message='"NEW or UPDATED Files are found in this Folder (FileOperations)'/>
+	</flow>
+</mule>

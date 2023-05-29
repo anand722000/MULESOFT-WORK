@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="FunctionAndLambdaFlow" doc:id="b3f2149f-10a1-4959-a8cf-e0c4e2329bfd" >
+		<ee:transform doc:name="Function" doc:id="baf8f98c-7edd-4c06-8185-aa7c0dcc681e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+/*
+You can declare a function in the header or body of a DataWeave script
+ by using the fun keyword. Then you can invoke the function at 
+ any point in the body of the script.
+ */
+
+
+fun toUpper(aString) = upper(aString)
+fun createUserData(name, countryCode = "US") = { "User name" : name, "Location": countryCode}
+fun optionalParamsLast(param1, param2 = 2, param3 = 3) =
+    { "param1": param1, "param2": param2, "param3": param3}
+fun optionalParamsFirst(param1 = 1, param2 = 2, param3) =
+    { "param1": param1, "param2": param2, "param3": param3}
+fun allParametersOptional(param1 = 1, param2 = 2, param3 = 3) =
+    { "param1": param1, "param2": param2, "param3": param3}
+    
+    //Function Overloading (multiple functions with the same name but different parameters)
+    fun toUpper(a: String) = upper(a)
+fun toUpper(a: Any) = null
+fun toUpper(a: String, b: Number) = upper(a) ++ b as String
+---
+[ toUpper("hello") ,
+toUpper("h" ++ "el" ++ lower("LO") ) ,
+createUserData("Cristian", "AR"), createUserData("Max The Mule"),
+ "optionalParamsLast(A)":optionalParamsLast('A'),
+  "optionalParamsLast(A, B)":optionalParamsLast('A', 'B'),
+  "optionalParamsLast(A, B, C)":optionalParamsLast('A', 'B', 'C'),
+  "optionalParamsFirst(A)":optionalParamsFirst('A'),
+  "optionalParamsFirst(A, B)":optionalParamsFirst('A', 'B'),
+  "optionalParamsFirst(A, B, C)":optionalParamsFirst('A', 'B', 'C'),
+  "allParametersOptional(A)":allParametersOptional('A'),
+  "allParametersOptional(A, B)":allParametersOptional('A', 'B'),
+  "allParametersOptional(A, B, C)":allParametersOptional('A', 'B', 'C')
+]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="FunctionAndLambdaFlow1" doc:id="9bd9d5a1-da2d-45f4-9861-bbef10fb2503" >
+		<ee:transform doc:name="Lambda Exp." doc:id="cff382e9-a1a5-4057-968a-fcd2e095ff91" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+/*
+ functions and lambdas (anonymous functions) can be passed as 
+ values or be assigned to variables.
+ */
+var names = ["john", "peter", "matt"]
+//Lambda Expression
+var toUser = (name) -> {
+  firstName: name 
+  }
+---
+{
+"users1": names map((name) -> upper(name)) ,
+/*
+ This example uses a lambda with an attribute that’s not explicitly 
+ named, and so is referred to by default as $.
+ */
+"users2": names map upper($) ,
+//Lambda
+"users3":toUser("AnandSingh") 
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

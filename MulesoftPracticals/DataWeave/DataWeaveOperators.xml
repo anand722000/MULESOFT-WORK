@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="DataWeaveOperatorsFlow" doc:id="85e49018-b1cb-4c3a-8810-ee4017ca8b01" >
+		<ee:transform doc:name="DW_Operators" doc:id="2eb56f49-05fc-4d13-a39b-d9724b03bcce" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/dw
+var myArray = [1,2,3,4,5]
+var orNot = if (1 + 1 == 4 or not 1 == 2) {"answer": "orNot - Condition met"}
+             else {"answer": "nope"}
+var andNot = if (1 + 1 == 2 and not 1 == 2) {"answer": "andNot - Condition met"}
+             else {"answer": "nope"}
+var notWithAndNot = if (not (1 + 1 == 2 and not 1 == 1)) {"answer": "notWithAndNot - Condition met"}
+              else {"answer": "nope"}
+var myMap = myArray map not (($ mod 2) == 0)
+---
+{ "mathOperators" : [
+    { "2 + 2" : (2 + 2) },
+    { "2 - 2" : (2 - 2) },
+    { "2 * 2" : (2 * 2) },
+    { "2 / 2" : (2 / 2) },
+    { "[1,2,3] - 1 + 4" : [1,2,3] - 1 + 4},
+    { "{a:1, b:2, c:3} - 'a' " : {a:1, b:2, c:3} - "a"},
+    { "|2021-03-02T10:39:59| - |P1D| + |PT3H|" : |2021-03-02T10:39:59| - |P1D| + |PT3H|}
+  ],
+  
+  
+   "relational" : [
+    { "1 < 1" : (1 < 1) },
+    { "1 > 2" : (1 > 2) },
+    { "1 <= 1" : (1 <= 1) },
+    { "1 >= 1" : (1 >= 1) }
+  ],
+  
+  
+  "equality" :
+  [
+    (1 == 1),
+    (1 == 2),
+    ("true" == true),
+    ("true" ~= true),
+    (['true'] ~= [true]),
+    ('1' ~= 1)
+  ],
+  
+  
+   "not" : [
+    "notTrue" : not true,
+    "notFalse" : not false,
+    "myMapWithNot" : myMap
+  ],
+  "and" : [
+    "andTrueFalse" : true and false,
+    "andIsTrue" : (1 + 1 == 2) and (2 + 2 == 4),
+    "andIsFalse" : (1 + 1 == 2) and (2 + 2 == 2)
+  ],
+  "or" : [
+    "orTrueFalse" : true or false,
+    "orIsTrue" : (1 + 1 == 2) or (2 + 2 == 2),
+    "orIsFalse" : (1 + 1 == 1) or (2 + 2 == 2)
+  ],
+  "!-vs-not" : [
+	  "example-!" : (! true or true),
+	  "example-not" : (not true or true)
+  ],
+
+  
+  "answers" :
+  [
+    orNot,
+    andNot,
+    notWithAndNot
+  ],
+  
+  
+  "prepend-append" : [
+  	 // Array on right side when prepending.
+     { "prepend" : 1 >> [2] },
+     { "prepend-number" : 1 >> [1] },
+     { "prepend-string" : "a" >> [1] },
+     { "prepend-object" : { "a" : "b"} >> [1] },
+     { "prepend-array" : [1] >> [2, 3] },
+     { "prepend-binary" : (1 as Binary) >> [1] },
+     { "prepend-date-time" : |23:57:59Z| >> [ |2017-10-01| ] },
+  	 // Array is on left side when appending.
+     { "append-number" : [1] << 2 },
+     { "append-string" : [1] << "a" },
+     { "append-object" : [1] << { "a" : "b"} },
+     { "append-array" : [1,2] << [1, 2, 3] },
+     { "append-binary" : [1] << (1 as Binary) },
+     { "append-date-time" : [ |2017-10-01| ] << |23:57:59Z| },
+     { "append-object-to-array" : [1,2] << {"a" : "b"} },
+     { "append-array-to-array1" : ["a","b"] << ["c","d"] },
+     { "append-array-to-array2" : [["a","b"],["c","d"]] << ["e","f"] },
+     // + always appends within the array
+     { "append-with-+" : [1] + 2 },
+     { "append-with-+" : [2] + 1 },
+     { "removeNumberFromArray" : ( [1,2,3] - 2 ) },
+     { "removeObjectFromArray" : ( [ {a : "b"}, {c : "d"} , { e : "f"} ] - { c : "d"} ) }
+  ],
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+}
+
+
+
+
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="DataWeaveOperatorsFlow1" doc:id="6c59ff6c-37c7-480f-a196-64223e6cb990" >
+		<ee:transform doc:name="DW_do_Scope" doc:id="a9fe0f39-3f86-4041-a3c1-547566122723" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/dw
+
+/* A do statement creates a scope in which new variables, functions, 
+annotations, or namespaces can be declared and used. The syntax is 
+similar to a mapping in that it is composed of a header and body 
+separated by ---. Its header is where all the declarations are 
+defined, and its body is the result of the expression. */
+fun myfun() = do {
+    var name = "DataWeave"
+    ---
+    name }
+
+var myVar = do {
+    var name = "DataWeave"
+    ---
+    name}
+
+fun test(p: String) = do {
+    var a = "Foo" ++ p
+    ---
+    a}
+
+
+
+---
+
+
+{ result: myfun(),
+ result: myVar ,
+ result: test(" Bar")
+ 
+ }
+
+
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="DataWeaveOperatorsFlow2" doc:id="038acdef-6455-4f69-9cee-d2f122a7dbb0" >
+		<ee:transform doc:name="DataWeave_IF/ELSE_FlowContrl" doc:id="1eb1b216-16ee-4e77-a2d5-6de9cb958925" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/dw
+/*An if statement evaluates a conditional expression and returns the 
+value under the if only if the conditional expression returns true.
+Otherwise, it returns the expression under else. Every if expression
+must have a matching else expression. */
+
+var myVar = { country : "FRANCE" }
+var aRecord =
+ [
+    "bookId":"101",
+    "title":"world history",
+    "price":"19.99"
+ ]
+
+---
+{ "ex":if (myVar.country == "USA")
+  { currency: "USD" }
+else { currency: "EUR" } ,
+	
+"ex1" : if (1 + 1 == 55) true
+	         else false,
+"ex2": if ([1,2,3,4][1] == 1) 1
+	         else "value of index 1 is not 1",
+"ex3":if (isEmpty(aRecord.bookId)) "ID is empty"
+	  	 else "ID is not empty",
+"ex4":aRecord.bookId map (idValue) ->
+	   	 if (idValue as Number == 101) idValue as Number
+		 else "not 101",
+"else/if":if (myVar.country =="USA")
+	{ currency: "USD" }
+else if (myVar.country =="UK")
+	{ currency: "GBP" }
+else { currency: "EUR" }		
+	}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

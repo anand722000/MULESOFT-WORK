@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="TESTINGFlow1" doc:id="d4ecc28b-0ee4-4074-85ea-2ac858808f60" >
+		<http:listener doc:name="Listener" doc:id="28564e00-c5cf-4db6-a330-a1cb98ca019b" config-ref="HTTP_Listener_config" path="/testing1"/>
+		<set-payload value='"AnandSingh"' doc:name="Seting Payload1" doc:id="435d162d-891f-4ce4-9220-643895788b30" />
+		<logger level="INFO" doc:name="Logger" doc:id="dd242547-2962-49b8-8f5c-6ed1128a37de" message='#["The payload is : " ++ payload]'/>
+	</flow>
+	<flow name="TESTINGFlow2" doc:id="e5c9b048-cc9d-4569-9093-e4cedeb57a8d" >
+		<http:listener doc:name="Listener" doc:id="adeb96a1-e2ea-46aa-b5ea-d8c3b2cd724e" config-ref="HTTP_Listener_config" path="/testing2"/>
+		<set-payload doc:name="Set Payload" doc:id="ec38553a-4b41-462a-acc2-3d33fd60f7b0" value='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"name" : "Anand"&#10;}]'/>
+		<logger level="INFO" doc:name="Logger" doc:id="b6fb596f-1d68-437a-baaf-cc84233a6a57" message='#["The Payload is : " ++ payload.name]'/>
+	</flow>
+	<flow name="TESTINGFlow" doc:id="d65ef63e-401b-405c-baa8-fc82509e54df" >
+		<http:listener doc:name="Listener" doc:id="3f184d0f-31b1-4c60-bb24-63c67bfe1931" config-ref="HTTP_Listener_config" path="/testing3"/>
+		<set-payload value='"Anand"' doc:name="Set Payload" doc:id="6eecca0d-fb45-4d10-ab0b-b7ce636784ae" />
+		<logger level="INFO" doc:name="Logger" doc:id="e71d6157-19b1-44a9-8e5b-ea15354880d4" message='The payload is  :   #[payload]'/>
+	</flow>
+	<flow name="ERROR-TESTING" doc:id="9281917e-6546-490f-a11f-af5b3c4a1e9f" >
+		<http:listener doc:name="Listener" doc:id="2f990c34-946e-403c-8602-6de73cab284e" config-ref="HTTP_Listener_config" path="/ep"/>
+		<ee:transform doc:name="Transform Message" doc:id="8aee13fa-8043-46fe-a3bb-b02839541b5d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	divide : 10/0
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="53cbec20-09d3-4fed-8cc3-70ecb91a2d62" message="#[payload]"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="5a1765b8-9797-448a-801d-c22fe90618c5" >
+				<logger level="INFO" doc:name="Logger" doc:id="1e95c244-2982-457d-ae0d-9ed9806416c5" message='"Expression Error . . ."'/>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>
